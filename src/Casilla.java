@@ -1,6 +1,7 @@
 public class Casilla {
 
 	private int comida;
+	private int [] coordenadas;
 	private int pobCivil;
 	private int pobMilitar;
 	private int pobTotal;
@@ -9,13 +10,15 @@ public class Casilla {
 	private final int comidaMax;
 	private final int productividad;
 
-	public Casilla (int comida, int comidaMax, int productividad, Pais pais) {
+	public Casilla (int comida, int comidaMax, int productividad, int pobMax, Pais pais, int [] coordenadas) {
 		this.comida = comida;
 		this.comidaMax = comidaMax;
 		this.productividad = productividad;
 		this.pais = pais;
+		this.pobMax = pobMax;
 		this.pobCivil = 0;
 		this.pobMilitar = 0;
+		this.coordenadas = coordenadas;
 		this.pobTotal = 0;
 	}
 
@@ -74,5 +77,18 @@ public class Casilla {
 	public int getPobMax() {
 		return this.pobMax;
 	}
+	public int [] getCoordenadas () {
+		return this.coordenadas;
+	}
 
+	@Override
+	public String toString() {
+		String imprimir = "";
+
+		imprimir="Casilla: ("+this.coordenadas[0]+","+this.coordenadas[1]+")\n";
+		imprimir+="Población civil:"+this.pobCivil+ "; Población militar:"+this.pobMilitar+"; Población máxima: "
+				+ this.pobMax+" ; Comida: "+this.comida+ "; Comida máxima: "+ this.comidaMax+"; País: "+this.pais.getName()
+				+ "; Productividad: " + this.productividad;
+		return imprimir;
+	}
 }

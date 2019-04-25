@@ -6,26 +6,27 @@ public class Mapa {
 
 	private static int dimension2 = 5;
 
-	private Casilla [][] posiciones;
+	private Casilla [][] posiciones = new Casilla[dimension1][dimension2];
 
 	public Mapa(){
 		for (int i = 0; i < getDimension1(); i++)
 			for (int j = 0; j < getDimension2(); j++) {
 				int pobMax = getRandomNumberInts(500,5000);
-				int comidaMax = getRandomNumberInts(pobMax,pobMax*3);
-				int comida = getRandomNumberInts(0,comidaMax);
+				int comidaMax = getRandomNumberInts(pobMax,pobMax*2);
+				int comida = getRandomNumberInts(pobMax,comidaMax);
 				int productividad = getRandomNumberInts(2,4);
-				posiciones[i][j] = new Casilla(comida, comidaMax, productividad, null);
+				int [] coordenadas = {i,j};
+				posiciones[i][j] = new Casilla(comida, comidaMax, productividad, pobMax,null, coordenadas);
 			}
 	}
 
 	public Casilla getMapaPosXY(int posicion1, int posicion2){
-		Casilla valor=posiciones[posicion1][posicion2];
+		Casilla valor = posiciones[posicion1][posicion2];
 		return valor;
 	}
 
 	@Override
-	public String  toString(){
+	public String toString(){
 		String imprimirLinea="";
 
 		String[] imprimirContenido=new String[this.getDimension1()];
