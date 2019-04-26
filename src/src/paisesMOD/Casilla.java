@@ -1,3 +1,5 @@
+package paisesMOD;
+
 public class Casilla {
 
 	private int comida;
@@ -86,8 +88,8 @@ public class Casilla {
 		String imprimir = "";
 
 		imprimir="Casilla: ("+this.coordenadas[0]+","+this.coordenadas[1]+")\n";
-		imprimir+="Población civil:"+this.pobCivil+ "; Población militar:"+this.pobMilitar+"; Población máxima: "
-				+ this.pobMax+" ; Comida: "+this.comida+ "; Comida máxima: "+ this.comidaMax+"; País: "+this.pais.getName()
+		imprimir+="Poblacion civil:"+this.pobCivil+ "; Poblacion militar:"+this.pobMilitar+"; Poblacion maxima: "
+				+ this.pobMax+" ; Comida: "+this.comida+ "; Comida maxima: "+ this.comidaMax+"; Pais: "+this.pais.getName()
 				+ "; Productividad: " + this.productividad;
 		return imprimir;
 	}
