@@ -1,6 +1,6 @@
 import java.util.Random;
 
-public class prueba1Risk {
+public class RealizarPartida {
 
 	public static void main(String args[]){
 
@@ -27,8 +27,8 @@ public class prueba1Risk {
 			while (casillaInicial.getPais()!= null) {
 				casillaInicial = Hispania.getMapaPosXY(getRandomNumberInts(0,Hispania.getDimension1()-1),getRandomNumberInts(0,Hispania.getDimension2()-1));
 			}
-			casillaInicial.addPobCivil(getRandomNumberInts(casillaInicial.getPobMax()*2/9,casillaInicial.getPobMax()*2/3));
-			casillaInicial.addPobMilitar(getRandomNumberInts(casillaInicial.getPobMax()*1/9,casillaInicial.getPobMax()*1/3));
+			casillaInicial.addPobCivil(333);
+			casillaInicial.addPobMilitar(167);
 			casillaInicial.setPais(listaPaises[i]);
 			listaPaises[i].addTerritorio(casillaInicial);
 			System.out.println(listaPaises[i]+"\n");
