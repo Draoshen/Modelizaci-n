@@ -1,5 +1,4 @@
 import java.util.Random;
-rafael subnormal
 public class RealizarPartida {
 
 	public static void main(String args[]){
@@ -10,6 +9,8 @@ public class RealizarPartida {
 		google.getTerritorio();
 		int numPaises=2;
 		int maxRange=5000;
+		int numTurnos=10;
+
 
 		Pais[] listaPaises=new Pais[numPaises];
 
@@ -33,6 +34,15 @@ public class RealizarPartida {
 			listaPaises[i].addTerritorio(casillaInicial);
 			System.out.println(listaPaises[i]+"\n");
 			listaPaises[i].printCasillas();
+		}
+
+		//Aqui es donde se va realizando la partida
+		while(numTurnos<10){
+
+			for (Pais pais: listaPaises) {
+				pais.realizarTurnoPais();
+			}
+			numTurnos++;
 		}
 	}
 

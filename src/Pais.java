@@ -16,6 +16,11 @@ public class Pais {
 		this.nombre=nombre;
 	}
 
+	public void realizarTurnoPais(){
+		for (Casilla casilla : this.territorio) {
+			casilla.realizarTurno();
+		}
+	}
 
 	public String getName(){
 		return this.nombre;

@@ -1,5 +1,5 @@
 public class Casilla {
- RodrigoFAN
+
 	private int comida;
 	private int [] coordenadas;
 	private int pobCivil;
@@ -9,6 +9,8 @@ public class Casilla {
 	private Pais pais; // TODO: Este atributo deberia ser un objeto Pais o solo su nombre?
 	private final int comidaMax;
 	private final int productividad;
+
+
 
 	public Casilla (int comida, int comidaMax, int productividad, int pobMax, Pais pais, int [] coordenadas) {
 		this.comida = comida;
@@ -48,6 +50,10 @@ public class Casilla {
 		this.comida -= cantidad;
 		// TODO: exception comida insuficiente -> consume todo y se queda a 0
 	}
+	public void realizarTurno(){
+
+	}
+
 	public void addPobCivil (int cantidad) {
 		this.pobCivil += cantidad;
 		this.pobTotal += cantidad;
