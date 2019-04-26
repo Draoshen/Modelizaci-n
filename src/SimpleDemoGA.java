@@ -1,4 +1,3 @@
-package paisesMOD;
 
 import java.util.Random;
 

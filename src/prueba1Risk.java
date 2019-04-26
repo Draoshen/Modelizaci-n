@@ -1,5 +1,3 @@
-package paisesMOD;
-
 import java.util.Random;
 
 public class prueba1Risk {
