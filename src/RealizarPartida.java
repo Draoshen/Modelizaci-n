@@ -1,5 +1,5 @@
 import java.util.Random;
-
+rafael subnormal
 public class RealizarPartida {
 
 	public static void main(String args[]){
