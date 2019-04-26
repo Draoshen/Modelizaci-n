@@ -1,5 +1,5 @@
 public class Casilla {
-
+ RodrigoFAN
 	private int comida;
 	private int [] coordenadas;
 	private int pobCivil;
