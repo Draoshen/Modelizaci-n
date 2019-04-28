@@ -10,7 +10,7 @@ public class RealizarPartida {
 		google.getTerritorio();
 		int numPaises=2;
 		int maxRange=5000;
-		int numTurnos=10;
+		int numTurnos=1;
 
 
 		Pais[] listaPaises=new Pais[numPaises];
@@ -24,8 +24,8 @@ public class RealizarPartida {
 		} */
 
 		for (int i = 0; i <listaPaises.length ; i++) {
-			int [] estrategias = new int [] {i+1, i+1, i+1};
-			listaPaises[i]=new Pais("Pais "+i, Hispania,0,0,0, estrategias);
+			int [] estrategias = new int [] {i+1, i+1, i+1, 0 , 1 , 2};
+			listaPaises[i]=new Pais("Pais "+ (i+1), Hispania,0,0,0, estrategias);
 			Casilla casillaInicial = Hispania.getCasilla(getRandomNumberInts(0,Hispania.getDimensionX()-1),getRandomNumberInts(0,Hispania.getDimensionY()-1));
 			while (casillaInicial.getPais()!= null) {
 				casillaInicial = Hispania.getCasilla(getRandomNumberInts(0,Hispania.getDimensionX()-1),getRandomNumberInts(0,Hispania.getDimensionY()-1));
@@ -39,12 +39,12 @@ public class RealizarPartida {
 		}
 
 		//Aqui es donde se va realizando la partida
-		while(numTurnos<10){
-
+		int turno = 1;
+		while(turno <= numTurnos){
 			for (Pais pais: listaPaises) {
 				pais.realizarTurnoPais();
 			}
-			numTurnos++;
+			turno++;
 		}
 	}
 

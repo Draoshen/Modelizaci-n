@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Pais {
 
@@ -69,8 +70,7 @@ public class Pais {
 	@Override
 	public String toString(){
 		String imprimir="";
-
-		imprimir="\n\nPais: "+this.getName()+"\n";
+		imprimir="\n\nPais: "+ this.getName() + ". Genoma: "+ Arrays.toString(this.genoma)+"\n";
 		imprimir+="Población civil:"+this.pobCivil+ "; Población militar:"+this.pobMilitar+" ; Comida:"+this.comida;
 		return imprimir;
 	}

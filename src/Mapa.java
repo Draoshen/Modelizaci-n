@@ -17,8 +17,11 @@ public class Mapa {
 				int comida = getRandomNumberInts(pobMax,comidaMax);
 				int productividad = getRandomNumberInts(2,4);
 				int [] coordenadas = {i,j};
-				posiciones[i][j] = new Casilla(comida, comidaMax, productividad, pobMax,null, coordenadas);
+				posiciones[i][j] = new Casilla(comida, comidaMax, productividad, pobMax,null, coordenadas, null);
 			}
+		for (int i = 0; i < getDimensionX(); i++)
+			for (int j = 0; j < getDimensionY(); j++)
+				posiciones[i][j].setAdyacentes(this.getAdyacentes(posiciones[i][j]));
 	}
 
 	public Casilla getCasilla(int posicion1, int posicion2){

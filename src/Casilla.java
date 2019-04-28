@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Casilla {
 
@@ -23,10 +24,12 @@ public class Casilla {
 	private final int comidaMax;
 	// Productividad: Unidades de comida que produce cada civil en cada turno
 	private final int productividad;
-	//
+	// Lista con las casillas adyacentes a la casilla actual (pueden ser 2 (casilla esquina), 3 (casilla borde) o 4 (casilla interior))
 	private ArrayList<Casilla> adyacentes;
 
-	public Casilla (int comida, int comidaMax, int productividad, int pobMax, Pais pais, int [] coordenadas) {
+
+	// TODO: limitar getters de la casilla para que solo la puedan usar casillas del mismo pais
+	public Casilla (int comida, int comidaMax, int productividad, int pobMax, Pais pais, int [] coordenadas, ArrayList<Casilla> adyacentes) {
 		this.comida = comida;
 		this.comidaMax = comidaMax;
 		this.productividad = productividad;
@@ -36,7 +39,7 @@ public class Casilla {
 		this.pobMilitar = 0;
 		this.coordenadas = coordenadas;
 		this.pobTotal = 0;
-		this.adyacentes = pais.getMapa().getAdyacentes(coordenadas);
+		this.adyacentes = adyacentes;
 	}
 
 	// Método para realizar una acción en el turno
@@ -50,72 +53,132 @@ public class Casilla {
 		// TODO: crear clase genoma ?
 		// Acceder a genoma[3] (cuarto espacio del genoma)
 		// Dependiendo del número que sea, se realiza una acción u otra
-		switch (genoma[3]) {
+		int result = 0;
+		int genPrioridad;
+		for (genPrioridad = 3; genPrioridad < 6 && result == 0; genPrioridad++)
+			result = eligeGen(genoma, genPrioridad);
+		// Si result sigue siendo 0, no se ha realizado ninguna acción, la casilla no hace nada en este turno
+
+		// Imprimir info de la acción realizada:
+		String accionRealizada;
+		switch (genPrioridad-1) {
+			case 3:
+				accionRealizada = "Mover Población. Población movida: ";
+				break;
+			case 4:
+				accionRealizada = "Mover Comida. Comida movida: ";
+				break;
+			case 5:
+				if (result != 0) {
+					accionRealizada = "Crear Población. Población creada: ";
+					break;
+				}
+			default:
+				accionRealizada = "Ninguna: ";
+		}
+		System.out.println("Casilla "+ Arrays.toString(this.coordenadas) + "Acción realizada: " + accionRealizada + result);
+	}
+
+	private int eligeGen (int [] genoma, int genPrioridad) {
+		switch (genoma[genPrioridad]) {
+			case 0:
+				// Se trata del primer gen del genoma (genoma[0]) que corresponde al movimiento de Mover Población
+				return politicaMoverPoblacion(genoma[0]);
 			case 1:
-				if (politicaMoverPoblacion(genoma[0]) == 0);
-				// siguiente politica
-			case 2: // politicaMoverComida(genoma[1]);
-			case 3: // politicaCrearPoblacion(genoma[2]);
-			default: // error
+				// Se trata del segundo gen del genoma (genoma[1]) que corresponde al movimiento de Mover Comida
+				return politicasMoverComida(genoma[1]);
+			case 2:
+				// Se trata del tercer gen del genoma (genoma[2]) que corresponde al movimiento de Crear Población
+				return politicasCrearPoblacion(genoma[2]);
+			default: return 0;
 		}
 	}
 
 	// ACCIONES A REALIZAR SEGÚN LA POLÍTICA DEL PAÍS
 
 	// De momento, dos distinas políticas a la hora de mover población
+	// Return: número de personas movidas
 	private int politicaMoverPoblacion (int politica) {
 		Casilla casillaDestino = null;
 		switch (politica) {
+			// Estrategia 1
 			case 1:
 				for (Casilla adyacente : this.adyacentes)
-					if (adyacente.getPais() != this.getPais() && adyacente.getPais() != null)  {
-						if (casillaDestino == null) casillaDestino = adyacente;
-						else if (casillaDestino.getProductividad() < adyacente.getProductividad())
-							casillaDestino = adyacente;
-					}
+					if ((adyacente.getPais() != this.getPais() && adyacente.getPais() != null) && (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
+						casillaDestino = adyacente;
 				if (casillaDestino != null) {
 					int militaresAMover = this.getPobMilitar()*3/4;
-					int militaresMovidos = this.moverPoblacion(0, militaresAMover, casillaDestino);
-					return militaresMovidos;
+					return this.moverPoblacion(0, militaresAMover, casillaDestino);
 				}
-				for (Casilla adyacente : this.adyacentes){
-					if (adyacente.getPais() == null) {
-						if (casillaDestino == null) casillaDestino = adyacente;
-						else if (casillaDestino.getProductividad() < adyacente.getProductividad())
-							casillaDestino = adyacente;
-				}
+				for (Casilla adyacente : this.adyacentes)
+					if ((adyacente.getPais() == null) && (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
+						casillaDestino = adyacente;
+
 				if (casillaDestino != null) {
-					int civilesAMover = this.getPobCivil() * 1 / 2; // TODO: cambiar a máximo viable
-					int civilesMovidos = this.moverPoblacion(civilesAMover,0,casillaDestino);
-					return civilesMovidos;
+					int civilesAMover = this.getPobCivil() /2; // TODO: cambiar a máximo viable
+					int militaresAMover = this.getPobMilitar() /2;
+					return this.moverPoblacion(civilesAMover,militaresAMover,casillaDestino);
 				}
 				return 0;
-			}
-			// TODO: estrategia 2
+			// TODO: Estrategia 2
 			case 2:
-				break;
+				for (Casilla adyacente : this.adyacentes)
+					if ((adyacente.getPais() == null) && (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
+						casillaDestino = adyacente;
+				if (casillaDestino != null) {
+					int civilesAMover = this.getPobCivil() /2; // TODO: cambiar a máximo viable
+					int militaresAMover = this.getPobMilitar() /2;
+					return this.moverPoblacion(civilesAMover,militaresAMover,casillaDestino);
+				}
+				for (Casilla adyacente : this.adyacentes)
+					if ((adyacente.getPais() != this.getPais() && adyacente.getPais() != null)
+					&& (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
+						casillaDestino = adyacente;
+				if (casillaDestino != null) {
+					int militaresAMover = this.getPobMilitar()*3/4;
+					return this.moverPoblacion(0, militaresAMover, casillaDestino);
+				}
+				return 0;
 			default:
-				//error
-				break;
+				return 0; // TODO: mejor debería devolver algún error?
 
+		}
+	}
+
+	//TODO
+	public int politicasMoverComida (int politica) {
+		Casilla casillaDestino = null;
+		boolean hayAdyacenteEnemiga = false;
+		boolean adyacentesSinEnemigos = true;
+		switch (politica) {
+			case 1:
+				for (Casilla adyacente : this.adyacentes)
+					if ((adyacente.getPais() != this.getPais() && adyacente.getPais() != null))
+						hayAdyacenteEnemiga = true;
+				if (hayAdyacenteEnemiga)
+					for (Casilla adyacente : this.adyacentes)
+						if (adyacente.getPais() == this.getPais()) {
+							for (Casilla adyacenteR : adyacente.adyacentes)
+								if (adyacenteR.getPais() != this.getPais() && adyacente.getPais() != null)
+									adyacentesSinEnemigos = false;
+							if (adyacentesSinEnemigos) casillaDestino = adyacente;
+						}
+					if (casillaDestino != null)
+						return this.moverComida((this.comida - this.pobTotal), casillaDestino);
+				for (Casilla adyacente : this.adyacentes)
+					if (adyacente.getComida() < adyacente.getPobTotal())
+						return this.moverComida((adyacente.pobTotal - adyacente.getComida()),adyacente);
 		}
 		return 0;
 	}
-
 	//TODO
-	public int politicasMoverComida (int [] genoma ) {
-		return 0;
-	}
-	//TODO
-	public int politicasCrearPoblacion(int [] genoma) {
+	public int politicasCrearPoblacion(int politica) {
 		return 0;
 	}
 
 
 	// POSIBLES MOVIMIENTOS EN UN TURNO
 
-	// No realizar nada en el turno;
-	private void doNothing () {}
 
 	// Acción de mover X población a una casilla adyacente
 	// Distinguir casos: casilla conquistada, casilla neutral, casilla enemiga (solo militares)
@@ -233,6 +296,9 @@ public class Casilla {
 	}
 	public int [] getCoordenadas () {
 		return this.coordenadas;
+	}
+	public void setAdyacentes (ArrayList<Casilla> adyacentes) {
+		this.adyacentes = adyacentes;
 	}
 
 	// Metodos auxiliares
