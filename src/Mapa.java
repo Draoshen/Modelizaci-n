@@ -1,16 +1,17 @@
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Mapa {
 
-	private static int dimension1 = 5;
+	private static int dimensionX = 5;
 
-	private static int dimension2 = 5;
+	private static int dimensionY = 5;
 
-	private Casilla [][] posiciones = new Casilla[dimension1][dimension2];
+	private Casilla [][] posiciones = new Casilla[dimensionX][dimensionY];
 
 	public Mapa(){
-		for (int i = 0; i < getDimension1(); i++)
-			for (int j = 0; j < getDimension2(); j++) {
+		for (int i = 0; i < getDimensionX(); i++)
+			for (int j = 0; j < getDimensionY(); j++) {
 				int pobMax = getRandomNumberInts(500,5000);
 				int comidaMax = getRandomNumberInts(pobMax,pobMax*2);
 				int comida = getRandomNumberInts(pobMax,comidaMax);
@@ -20,23 +21,27 @@ public class Mapa {
 			}
 	}
 
-	public Casilla getMapaPosXY(int posicion1, int posicion2){
+	public Casilla getCasilla(int posicion1, int posicion2){
 		Casilla valor = posiciones[posicion1][posicion2];
 		return valor;
+	}
+
+	public int [] getCoordenadas (Casilla casilla) {
+		return casilla.getCoordenadas();
 	}
 
 	@Override
 	public String toString(){
 		String imprimirLinea="";
 
-		String[] imprimirContenido=new String[this.getDimension1()];
+		String[] imprimirContenido=new String[this.getDimensionX()];
 
 		for (int i = 0; i < imprimirContenido.length; i++) {
 			imprimirContenido[i]="Row number= "+i +"---> ";
 		}
 
-		for (int i = 0; i < this.getDimension1(); i++) {
-			for (int j = 0; j < this.getDimension2(); j++) {
+		for (int i = 0; i < this.getDimensionX(); i++) {
+			for (int j = 0; j < this.getDimensionY(); j++) {
 				imprimirContenido[i]+="["+posiciones[i][j]+"]";
 			}
 			imprimirLinea+="[  "+ imprimirContenido[i] +" ] \n";
@@ -44,13 +49,31 @@ public class Mapa {
 		return imprimirLinea;
 	}
 
-	public int getDimension2() {
-		// TODO Auto-generated method stub
-		return this.dimension2;
+	public int getDimensionY() {
+		return this.dimensionY;
 	}
 
-	public  int getDimension1() {
-		return this.dimension1;
+	public int getDimensionX() {
+		return this.dimensionX;
+	}
+
+	public ArrayList<Casilla> getAdyacentes (int [] coordenadas) {
+		int x = coordenadas[0];
+		int y = coordenadas[1];
+		ArrayList<Casilla> adyacentes = new ArrayList<Casilla>();
+
+		for (int i = 0; i < this.getDimensionX(); i++)
+			for (int j = 0; j < this.getDimensionY(); j++) {
+				if (((i == x) && ((j == y+1) || (j == y-1)))
+						|| ((j == y) && ((i == x+1) || (i == x-1)))) {
+					adyacentes.add(this.posiciones[i][j]);
+				}
+			}
+		return adyacentes;
+	}
+
+	public ArrayList<Casilla> getAdyacentes (Casilla casillaActual) {
+		return getAdyacentes(casillaActual.getCoordenadas());
 	}
 
 	public static int getRandomNumberInts(int min, int max){

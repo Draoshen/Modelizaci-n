@@ -3,8 +3,9 @@ public class RealizarPartida {
 
 	public static void main(String args[]){
 
-		Pais google = new Pais("Google",0,0,0);
+		int [] estragegiasGoogle = new int [] {1,1,1};
 		Mapa Hispania = new Mapa();
+		Pais google = new Pais("Google",Hispania,0,0,0,estragegiasGoogle);
 		System.out.println(google);
 		google.getTerritorio();
 		int numPaises=2;
@@ -23,10 +24,11 @@ public class RealizarPartida {
 		} */
 
 		for (int i = 0; i <listaPaises.length ; i++) {
-			listaPaises[i]=new Pais("Pais "+i,0,0,0);
-			Casilla casillaInicial = Hispania.getMapaPosXY(getRandomNumberInts(0,Hispania.getDimension1()-1),getRandomNumberInts(0,Hispania.getDimension2()-1));
+			int [] estrategias = new int [] {i+1, i+1, i+1};
+			listaPaises[i]=new Pais("Pais "+i, Hispania,0,0,0, estrategias);
+			Casilla casillaInicial = Hispania.getCasilla(getRandomNumberInts(0,Hispania.getDimensionX()-1),getRandomNumberInts(0,Hispania.getDimensionY()-1));
 			while (casillaInicial.getPais()!= null) {
-				casillaInicial = Hispania.getMapaPosXY(getRandomNumberInts(0,Hispania.getDimension1()-1),getRandomNumberInts(0,Hispania.getDimension2()-1));
+				casillaInicial = Hispania.getCasilla(getRandomNumberInts(0,Hispania.getDimensionX()-1),getRandomNumberInts(0,Hispania.getDimensionY()-1));
 			}
 			casillaInicial.addPobCivil(333);
 			casillaInicial.addPobMilitar(167);

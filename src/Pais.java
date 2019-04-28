@@ -2,18 +2,33 @@ import java.util.ArrayList;
 
 public class Pais {
 
-	private ArrayList<Casilla> territorio;
-	private int comida;
-	private int pobCivil;
-	private int pobMilitar;
+	// Nombre del país
 	private String nombre;
+	// Índices de las 3 estrategias que utiliza el país
+	private int [] genoma = new int [6];
+	// Conjunto de casillas pertenecientes al país
+	private ArrayList<Casilla> territorio;
+	// Cantidad de comida que cuesta crear un civil o un militar
+	private int precioCrearPoblacion = 3;
+	// Mapa al que pertenece el país
+	private Mapa mapa;
 
-	public Pais(String nombre,int comida,int pobCivil, int pobMilitar){
+	// Cantidad de comida actual en país
+	private int comida;
+	// Número de civiles en el país
+	private int pobCivil;
+	// Número de militares en el país
+	private int pobMilitar;
+
+
+	public Pais(String nombre, Mapa mapa, int comida,int pobCivil, int pobMilitar, int [] genoma){
 		this.territorio = new ArrayList<Casilla>();
-		this.comida=comida;
-		this.pobCivil=pobCivil;
+		this.mapa = mapa;
+		this.comida = comida;
+		this.pobCivil = pobCivil;
 		this.pobMilitar = pobMilitar;
-		this.nombre=nombre;
+		this.nombre = nombre;
+		this.genoma = genoma;
 	}
 
 	public void realizarTurnoPais(){
@@ -22,9 +37,17 @@ public class Pais {
 		}
 	}
 
+	public int [] getGenoma () {
+		return this.genoma;
+	}
+
 	public String getName(){
 		return this.nombre;
 	}
+
+	public Mapa getMapa() { return  this.mapa; }
+
+	public int getPrecioCrearPoblacion () { return this.precioCrearPoblacion; }
 
 	public ArrayList<Casilla> getTerritorio() {
 		return this.territorio;
