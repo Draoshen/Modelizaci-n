@@ -57,11 +57,12 @@ public class Casilla {
 		int genPrioridad;
 		for (genPrioridad = 3; genPrioridad < 6 && result == 0; genPrioridad++)
 			result = eligeGen(genoma, genPrioridad);
+		genPrioridad -= 1;
 		// Si result sigue siendo 0, no se ha realizado ninguna acción, la casilla no hace nada en este turno
-
+		//System.out.println("GenPrioridad: " +(genPrioridad));
 		// Imprimir info de la acción realizada:
 		String accionRealizada;
-		switch (genPrioridad-1) {
+		switch (genPrioridad) {
 			case 3:
 				accionRealizada = "Mover Población. Población movida: ";
 				break;
@@ -76,10 +77,11 @@ public class Casilla {
 			default:
 				accionRealizada = "Ninguna: ";
 		}
-		System.out.println("Casilla "+ Arrays.toString(this.coordenadas) + "Acción realizada: " + accionRealizada + result);
+		System.out.println("\nCasilla "+ Arrays.toString(this.coordenadas) + "Acción realizada: " + accionRealizada + result);
 	}
 
 	private int eligeGen (int [] genoma, int genPrioridad) {
+		//System.out.println("Genoma y genPrioridad: " + Arrays.toString(genoma) + genPrioridad);
 		switch (genoma[genPrioridad]) {
 			case 0:
 				// Se trata del primer gen del genoma (genoma[0]) que corresponde al movimiento de Mover Población
@@ -96,6 +98,12 @@ public class Casilla {
 
 	// ACCIONES A REALIZAR SEGÚN LA POLÍTICA DEL PAÍS
 
+	// TODO: establecer cuándo se ocupa una casilla
+	// TODO: establecer cuándo se conquista una casilla
+	// TODO: añadir condición para conquistar casilla (mover poblacion civil): mitad de la ocup maxima o tener pobl maxima en casilla actual
+	// TODO: añadir condiciones de conquista: la pob civil que se queda /se mata
+	// TODO: establecer que si se llega al máximo de comida, el sobrante se transforma en poblacion civil
+	// TODO: establecer que se gaste comida en cada turno / muera gente por falta de comida
 	// De momento, dos distinas políticas a la hora de mover población
 	// Return: número de personas movidas
 	private int politicaMoverPoblacion (int politica) {
@@ -117,6 +125,8 @@ public class Casilla {
 				if (casillaDestino != null) {
 					int civilesAMover = this.getPobCivil() /2; // TODO: cambiar a máximo viable
 					int militaresAMover = this.getPobMilitar() /2;
+					casillaDestino.setPais(this.pais);
+					this.pais.addJustConquistadas(casillaDestino);
 					return this.moverPoblacion(civilesAMover,militaresAMover,casillaDestino);
 				}
 				return 0;
@@ -128,6 +138,8 @@ public class Casilla {
 				if (casillaDestino != null) {
 					int civilesAMover = this.getPobCivil() /2; // TODO: cambiar a máximo viable
 					int militaresAMover = this.getPobMilitar() /2;
+					casillaDestino.setPais(this.pais);
+					this.pais.addJustConquistadas(casillaDestino);
 					return this.moverPoblacion(civilesAMover,militaresAMover,casillaDestino);
 				}
 				for (Casilla adyacente : this.adyacentes)
@@ -325,7 +337,7 @@ public class Casilla {
 	public String toString() {
 		String imprimir = "";
 
-		imprimir="Casilla: ("+this.coordenadas[0]+","+this.coordenadas[1]+")\n";
+		imprimir="\nCasilla: ("+this.coordenadas[0]+","+this.coordenadas[1]+")\n";
 		imprimir+="Población civil:"+this.pobCivil+ "; Población militar:"+this.pobMilitar+"; Población máxima: "
 				+ this.pobMax+" ; Comida: "+this.comida+ "; Comida máxima: "+ this.comidaMax+"; País: "+this.pais.getName()
 				+ "; Productividad: " + this.productividad;

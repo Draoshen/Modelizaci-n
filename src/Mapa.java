@@ -79,6 +79,18 @@ public class Mapa {
 		return getAdyacentes(casillaActual.getCoordenadas());
 	}
 
+	public void printMapa () {
+		for (int i = 0; i < dimensionY; i++) {
+			System.out.print("._____");
+		}
+		System.out.print(".\n");
+		for (int i = 0; i < dimensionX; i++) {
+			for (int j = 0; j < dimensionY; j++)
+				System.out.print(".__" + String.valueOf(posiciones[i][j].getPais().getId()) + "__");
+			System.out.print(".\n");
+		}
+	}
+
 	public static int getRandomNumberInts(int min, int max){
 		Random random = new Random();
 		return random.ints(min,(max+1)).findFirst().getAsInt();
