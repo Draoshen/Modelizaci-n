@@ -1,3 +1,5 @@
+import exceptions.ComidaInsufException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -12,6 +14,8 @@ public class Casilla {
 	private int pobMilitar;
 	// Población total de la casilla
 	private int pobTotal;
+	// Número de militares enemigos en la casilla
+	private int militaresEnem;
 
 	// ATRIBUTOS PROPIOS DE UNA CASILLA
 	// Coordenadas que le corresponden en el mapa
@@ -37,6 +41,7 @@ public class Casilla {
 		this.pobMax = pobMax;
 		this.pobCivil = 0;
 		this.pobMilitar = 0;
+		this.militaresEnem = 0;
 		this.coordenadas = coordenadas;
 		this.pobTotal = 0;
 		this.adyacentes = adyacentes;
@@ -101,27 +106,49 @@ public class Casilla {
 	// TODO: establecer cuándo se ocupa una casilla
 	// TODO: establecer cuándo se conquista una casilla
 	// TODO: añadir condición para conquistar casilla (mover poblacion civil): mitad de la ocup maxima o tener pobl maxima en casilla actual
-	// TODO: añadir condiciones de conquista: la pob civil que se queda /se mata
+	// TODO: añadir condiciones de conquista: la pob civil que se queda /se mata tras un ataque
 	// TODO: establecer que si se llega al máximo de comida, el sobrante se transforma en poblacion civil
 	// TODO: establecer que se gaste comida en cada turno / muera gente por falta de comida
 	// De momento, dos distinas políticas a la hora de mover población
 	// Return: número de personas movidas
 	private int politicaMoverPoblacion (int politica) {
 		Casilla casillaDestino = null;
+		int movidos = 0;
 		switch (politica) {
 			// Estrategia 1
 			case 1:
+				// ATACA: solo mueve militares
 				for (Casilla adyacente : this.adyacentes)
 					if ((adyacente.getPais() != this.getPais() && adyacente.getPais() != null) && (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
 						casillaDestino = adyacente;
 				if (casillaDestino != null) {
 					int militaresAMover = this.getPobMilitar()*3/4;
-					return this.moverPoblacion(0, militaresAMover, casillaDestino);
+					casillaDestino.addMilitaresEnem(militaresAMover);
+					this.subPobMilitar(militaresAMover);
+					// Ataca la casilla destino con menos militares de los que hay allí.
+					if (casillaDestino.getMilitaresEnem() <= casillaDestino.getPobMilitar()) {
+						casillaDestino.subPobMilitar(casillaDestino.militaresEnem);
+						casillaDestino.setMilitaresEnem(0);
+					}
+					// Ataca la casilla destino con más militares de los que hay allí.
+					else {
+						int excesoMilitares = 0;
+						casillaDestino.setPobMilitar(0);
+						excesoMilitares = casillaDestino.getMilitaresEnem() - (casillaDestino.pobMax - casillaDestino.getPobCivil());
+						if (excesoMilitares > 0) {
+
+						}
+						casillaDestino.setMilitaresEnem(0);
+						// TODO: que maten la mitad aprox de la pob civil
+						casillaDestino.setPais(this.pais);
+					}
+					return militaresAMover;
 				}
+
+				// CONQUISTA: mueve civiles y militares
 				for (Casilla adyacente : this.adyacentes)
 					if ((adyacente.getPais() == null) && (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
 						casillaDestino = adyacente;
-
 				if (casillaDestino != null) {
 					int civilesAMover = this.getPobCivil() /2; // TODO: cambiar a máximo viable
 					int militaresAMover = this.getPobMilitar() /2;
@@ -132,6 +159,7 @@ public class Casilla {
 				return 0;
 			// TODO: Estrategia 2
 			case 2:
+				// CONQUISTA: mueve civiles y militares
 				for (Casilla adyacente : this.adyacentes)
 					if ((adyacente.getPais() == null) && (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
 						casillaDestino = adyacente;
@@ -142,6 +170,7 @@ public class Casilla {
 					this.pais.addJustConquistadas(casillaDestino);
 					return this.moverPoblacion(civilesAMover,militaresAMover,casillaDestino);
 				}
+				// ATACA: solo mueve militares
 				for (Casilla adyacente : this.adyacentes)
 					if ((adyacente.getPais() != this.getPais() && adyacente.getPais() != null)
 					&& (casillaDestino == null || casillaDestino.getProductividad() < adyacente.getProductividad()))
@@ -152,10 +181,12 @@ public class Casilla {
 				}
 				return 0;
 			default:
-				return 0; // TODO: mejor debería devolver algún error?
+				return 0;
 
 		}
 	}
+
+
 
 	//TODO
 	public int politicasMoverComida (int politica) {
@@ -163,6 +194,7 @@ public class Casilla {
 		boolean hayAdyacenteEnemiga = false;
 		boolean adyacentesSinEnemigos = true;
 		switch (politica) {
+			// Estrategia 1
 			case 1:
 				for (Casilla adyacente : this.adyacentes)
 					if ((adyacente.getPais() != this.getPais() && adyacente.getPais() != null))
@@ -180,6 +212,10 @@ public class Casilla {
 				for (Casilla adyacente : this.adyacentes)
 					if (adyacente.getComida() < adyacente.getPobTotal())
 						return this.moverComida((adyacente.pobTotal - adyacente.getComida()),adyacente);
+
+			// Estrategia 2
+			case 2: break;
+			default:
 		}
 		return 0;
 	}
@@ -191,13 +227,12 @@ public class Casilla {
 
 	// POSIBLES MOVIMIENTOS EN UN TURNO
 
-
 	// Acción de mover X población a una casilla adyacente
 	// Distinguir casos: casilla conquistada, casilla neutral, casilla enemiga (solo militares)
 	public int moverPoblacion (int civiles, int militares, Casilla casillaDestino) {
 		int civilesMovidos = 0;
 		int militaresMovidos = 0;
-		while ( this.comprobarMoverPoblacion(casillaDestino)
+		while ( this.comprobarMoverPoblacion(casillaDestino,2)
 				&& (civilesMovidos < civiles)
 				&& (militaresMovidos < militares)) {
 			this.subPobCivil(1);
@@ -206,12 +241,12 @@ public class Casilla {
 			casillaDestino.addPobMilitar(1);
 			civilesMovidos++; militaresMovidos++;
 		}
-		while (civilesMovidos < civiles && this.comprobarMoverPoblacion(casillaDestino)) {
+		while (civilesMovidos < civiles && this.comprobarMoverPoblacion(casillaDestino,1)) {
 			this.subPobCivil(1);
 			casillaDestino.addPobCivil(1);
 			civilesMovidos ++;
 		}
-		while (militaresMovidos < militares && this.comprobarMoverPoblacion(casillaDestino)) {
+		while (militaresMovidos < militares && this.comprobarMoverPoblacion(casillaDestino,1)) {
 			this.subPobMilitar(1);
 			casillaDestino.addPobMilitar(1);
 			militaresMovidos ++;
@@ -235,13 +270,23 @@ public class Casilla {
 	public int crearPoblacion (int civiles, int militares) {
 		int civilesCreados = 0;
 		int militaresCreados = 0;
-		while (this.comprobarCrearPoblacion()
+		while (this.comprobarCrearPoblacion(2)
 				&& (civilesCreados < civiles)
 				&& (militaresCreados < militares)) {
 			this.addPobCivil(1);
 			this.addPobMilitar(1);
 			this.subComida(this.pais.getPrecioCrearPoblacion());
 			civilesCreados++; militaresCreados++;
+		}
+		while (this.comprobarCrearPoblacion(1) && (civilesCreados < civiles)) {
+			this.addPobCivil(1);
+			this.subComida(this.pais.getPrecioCrearPoblacion());
+			civilesCreados++;
+		}
+		while (this.comprobarCrearPoblacion(1) && (militaresCreados < militares)) {
+			this.addPobMilitar(1);
+			this.subComida(this.pais.getPrecioCrearPoblacion());
+			militaresCreados++;
 		}
 		return (civilesCreados + militaresCreados);
 	}
@@ -260,48 +305,17 @@ public class Casilla {
 	public int getPobTotal () {
 		return this.pobTotal;
 	}
+	public int getMilitaresEnem () {
+		return this.militaresEnem;
+	}
 	public int getProductividad () {
 		return this.productividad;
 	}
 	public int getComidaMax () {
 		return this.comidaMax;
 	}
-	public ArrayList<Casilla> getAdyacentes () {
-		return this.adyacentes;
-	}
-	public void addComida (int cantidad) {
-		this.comida += cantidad;
-		// TODO: exception limite comida
-	}
-	public void subComida (int cantidad) {
-		this.comida -= cantidad;
-		// TODO: exception comida insuficiente -> consume todo y se queda a 0
-	}
-	public void addPobCivil (int cantidad) {
-		this.pobCivil += cantidad;
-		this.pobTotal += cantidad;
-		// TODO: exception limite poblacion
-	}
-	public void subPobCivil (int cantidad) {
-		this.pobCivil -= cantidad;
-		this.pobTotal -= cantidad;
-		// TODO: exception pobCivil insuficiente -> mata todos y se queda a 0
-	}
-	public void addPobMilitar (int cantidad) {
-		this.pobMilitar += cantidad;
-		this.pobTotal += cantidad;
-		// TODO: exception limite poblacion
-	}
-	public void subPobMilitar (int cantidad) {
-		this.pobMilitar -= cantidad;
-		this.pobTotal -= cantidad;
-		// TODO: exception pobMilitar insuficiente -> mata todos y se queda a 0
-	}
 	public Pais getPais () {
 		return this.pais;
-	}
-	public void setPais (Pais pais) {
-		this.pais = pais;
 	}
 	public int getPobMax() {
 		return this.pobMax;
@@ -312,25 +326,126 @@ public class Casilla {
 	public void setAdyacentes (ArrayList<Casilla> adyacentes) {
 		this.adyacentes = adyacentes;
 	}
+	public void setPobMilitar (int cantidad) {
+		if (0 <= cantidad && cantidad <= (this.pobMax-this.pobCivil)) {
+			this.pobMilitar = cantidad;
+			this.pobTotal = this.pobCivil + this.pobMilitar;
+		}
+	}
+	public void setMilitaresEnem (int cantidad) {
+		this.militaresEnem = cantidad;
+	}
+	public void setPais (Pais pais) {
+		this.pais = pais;
+	}
+	public ArrayList<Casilla> getAdyacentes () {
+		return this.adyacentes;
+	}
+	public int addComida (int cantidad) {
+		int anyadida = 0;
+		if (this.comidaMax <= (this.comida + cantidad)) {
+			anyadida = this.comidaMax - this.comida;
+			this.comida = this.comidaMax;
+		}
+		else {
+			this.comida += cantidad;
+			anyadida = cantidad;
+		}
+		return anyadida;
+	}
+	public int addPobCivil (int cantidad) {
+		int anyadida = 0;
+		if (this.pobMax < (this.pobTotal + cantidad)) {
+			anyadida = this.pobMax - this.pobTotal;
+			this.pobCivil = this.pobCivil + (this.pobMax - this.pobTotal);
+			this.pobTotal = this.pobMax;
+		}
+		else {
+			anyadida = cantidad;
+			this.pobCivil += cantidad;
+			this.pobTotal += cantidad;
+		}
+		return anyadida;
+	}
+	public int addPobMilitar (int cantidad) {
+		int anyadida = 0;
+		if (this.pobMax < (this.pobTotal + cantidad)) {
+			anyadida = this.pobMax - this.pobTotal;
+			this.pobMilitar = this.pobMilitar + (this.pobMax - this.pobTotal);
+			this.pobTotal = this.pobMax;
+		}
+		else {
+			anyadida = cantidad;
+			this.pobMilitar += cantidad;
+			this.pobTotal += cantidad;
+		}
+		return anyadida;
+	}
+	public void addMilitaresEnem (int cantidad) {
+		this.militaresEnem = cantidad;
+	}
+	public int subComida (int cantidad) {
+		int restada = 0;
+		if (this.comida < cantidad) {
+			restada = cantidad - this.comida;
+			this.comida = 0;
+		}
+		else {
+			restada = cantidad;
+			this.comida -= cantidad;
+		}
+		return restada;
+	}
+	public int subPobCivil (int cantidad) {
+		int restada = 0;
+		if (this.pobCivil < cantidad) {
+			restada -= this.pobCivil;
+			this.pobTotal -= this.pobCivil;
+			this.pobCivil = 0;
+		}
+		else {
+			restada = cantidad;
+			this.pobCivil -= cantidad;
+			this.pobTotal -= cantidad;
+		}
+		return restada;
+	}
+	public int subPobMilitar (int cantidad) {
+		int restada = 0;
+		if (this.pobMilitar < cantidad) {
+			restada = this.pobMilitar;
+			this.pobTotal = 0;
+			this.pobMilitar = 0;
+		}
+		else {
+			restada = cantidad;
+			this.pobMilitar -= cantidad;
+			this.pobTotal -= cantidad;
+		}
+		return restada;
+	}
 
 	// Metodos auxiliares
+
 	// Método auxiliar para comprobar si es viable mover población en cada momento
-	private boolean comprobarMoverPoblacion (Casilla casillaDestino) {
-		return ((casillaDestino.getPobTotal() < (casillaDestino.getPobMax()-1))
-				&& (casillaDestino.getPobTotal() < (casillaDestino.getComida()-1))
+	private boolean comprobarMoverPoblacion (Casilla casillaDestino, int cantidad) {
+		return ((casillaDestino.getPobTotal() < (casillaDestino.getPobMax()-(cantidad-1)))
+				&& (casillaDestino.getPobTotal() < (casillaDestino.getComida()-(cantidad-1)))
 				&& (this.pobTotal < (this.comida-1))
 				&& (0 < (this.pobTotal-1)));
 	}
+
 	// Método auxiliar para comprobar si es viable mover comida en cada momento
 	private boolean comprobarMoverComida (Casilla casillaDestino) {
 		return ((casillaDestino.getComida() < casillaDestino.getComidaMax())
 				&& (this.pobTotal < this.comida)
 				&& (0 < this.comida));
 	}
+
 	// Método auxiliar para comprobar si es viable crear población en cada momento
-	private boolean comprobarCrearPoblacion () {
-		return ((this.pobTotal < (this.pobMax-1))
-				&& (this.pobTotal < (this.comida-1)));
+	private boolean comprobarCrearPoblacion (int cantidad) {
+		return ((this.pobTotal < (this.pobMax-(cantidad-1))
+				&& (this.pobTotal < (this.comida-(cantidad-1))));
 	}
 
 	@Override

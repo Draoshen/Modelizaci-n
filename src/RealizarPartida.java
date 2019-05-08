@@ -48,15 +48,15 @@ public class RealizarPartida {
 			for (Pais pais: listaPaises) {
 				System.out.println("\nTurno del pais: " + pais.getName());
 				pais.realizarTurnoPais();
-				// Si durante su turno ha conquistado algunas casillas, se añaden ahora (final de su turno) a su territorio
-				for (Casilla justConquistada : pais.getJustConquistadas())
-					pais.addTerritorio(justConquistada);
-				pais.clearJustConquistadas();
+				pais.terminaTurno();
 			}
 			turno++;
 		}
 		Hispania.printMapa();
 	}
+	// TODO : realmente hacen falta las excepciones? Los países solo van a actuar si cumplen las condiciones
+	// TODO : BUSCAR INTERFACE JAVA
+	// TODO : BUSCAR VARIAS SI HAY EXCEPCIONES A LA VEZ, ENTONCES PONER VARIOS CATCH'S
 
 	public static int getRandomNumberInts(int min, int max){
 		Random random = new Random();

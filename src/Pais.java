@@ -37,13 +37,40 @@ public class Pais {
 		this.genoma = genoma;
 	}
 
+	// Método para que cada casilla realice una acción.
+	// Consiste en acciones sobre las que el país tiene control, la "elección" del jugador.
+	// Ejemplos: Ataques, conquistas, mov. de comida, crear población, etc.
 	public void realizarTurnoPais(){
 		this.printCasillas();
 		for (Casilla casilla : this.territorio) {
 			casilla.realizarTurno();
 		}
-		for (Casilla justcon: this.justConquistadas){
-			System.out.println("Conquistada "+ justcon.getCoordenadas());
+		for (Casilla justCon: this.justConquistadas){
+			System.out.println("Conquistada "+ Arrays.toString(justCon.getCoordenadas()));
+		}
+	}
+
+	// Método para que el entorno (mapa) realice sus acciones.
+	// Consiste en acciones de las que el país no tiene control, "naturales", las reglas del juego.
+	// Se realizan después del turno del país. Ejemplos:
+	// Muere pob. si falta comida, todos consumen comida, los civiles producen comida, etc.
+	// TODO: realiza acciones de fin de turno:
+	// - consumir comida (pobTotal)
+	// - producir comida (pobCivil, productividad)
+	// - añadir territorios conquistados al país
+	public void terminaTurno() {
+
+		for (Casilla justConquistada : this.getJustConquistadas())
+			this.addTerritorio(justConquistada);
+		this.clearJustConquistadas();
+		for (Casilla casilla : this.territorio) {
+			casilla.addComida(casilla.getPobCivil() * casilla.getProductividad());
+			casilla.subComida(casilla.getPobTotal());
+			// TODO: si hacemos que estos métodos lancen excepciones, utilizar aquí un try catch
+			// si no, con ifs comprobando que se cumplan las condiciones
+			// if (falta comida) then mata gente
+			// if (alcanzado maximo comida) then crea gente
+			// if (poblacion esta a cero) then pais pierde casilla
 		}
 	}
 
