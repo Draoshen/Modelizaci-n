@@ -15,19 +15,23 @@ public class OperadorCruce {
 
 		if (reproductores.size() <= 1) throw new Exception("REPRODUCTORES INSUFICIENTES: Se necesitan al menos 2.");
 
-		repAux = reproductores;
-		while (numGenerados < cantidad) {
+		System.out.println("num reproductores: "+reproductores.size());
+		for (Individuo individuo : reproductores)
+			System.out.println("reproductores: " + individuo.toString());
+		repAux = (ArrayList<Individuo>) reproductores.clone();
+		while (numGenerados < cantidad && 2 <= reproductores.size()) {
 
 			// Si ya se han reproducido todos, permitimos repeticiones de reproductores
-			if (repAux.size() < 2) repAux = reproductores;
-			int prog1 = Utiles.getRandomNumberInts(0,repAux.size());
-			int prog2 = Utiles.getRandomNumberInts(0,repAux.size());
-			while (prog1 == prog2) prog2 = Utiles.getRandomNumberInts(0,repAux.size());
+			if (repAux.size() < 2) repAux = (ArrayList<Individuo>) reproductores.clone();
+			int prog1 = Utiles.getRandomNumberInts(0,repAux.size()-1);
+			int prog2 = Utiles.getRandomNumberInts(0,repAux.size()-1);
+			while (prog1 == prog2) prog2 = Utiles.getRandomNumberInts(0,repAux.size()-1);
 			nuevos.add(cruzar(repAux.get(prog1),repAux.get(prog2)));
-			repAux.remove(prog1);
-			repAux.remove(prog2);
+			if (prog1 > prog2) { repAux.remove(prog1); repAux.remove(prog2); }
+			else { repAux.remove(prog2); repAux.remove(prog1); }
 			numGenerados++;
 		}
+
 		if (nuevos.size() != cantidad) throw new Exception("ERROR. No se ha generado la cantidad esperada de individuos ("+cantidad+").");
 
 		return nuevos.toArray(new Individuo[nuevos.size()]);

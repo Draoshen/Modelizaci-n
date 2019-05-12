@@ -1,4 +1,3 @@
-import java.util.Random;
 import java.util.Arrays;
 import java.util.Comparator;
 import game.*;
@@ -15,7 +14,7 @@ public class Main {
 		int[][] puntuaciones = new int[tamañoPoblacion][tamañoPoblacion];
 
 		for (int i = 0; i < tamañoPoblacion; i++) {
-			poblacion[i] = new Individuo();
+			poblacion[i] = new Individuo(i);
 			for (int j = 0; j < 3; j++)
 				poblacion[i].modGen(j, Utiles.getRandomNumberInts(1, 2));
 			for (int j = 3; j < 6; j++)
@@ -42,25 +41,35 @@ public class Main {
 
 		for (int generacion = 0; generacion < numGeneraciones; generacion++) {
 
+			System.out.println("GENERACIÓN: " + generacion);
 			Mapa mapa = new Mapa(5, 5);
 
 			// EVALUACIÓN: Enfrentamos todos contra todos y los evaluamos
 			for (int i = 0; i < tamañoPoblacion; i++) {
 				for (int j = (i + 1); j < tamañoPoblacion; j++) {
 					if (i != j) {
+						System.out.println("i , j : " + i + j);
+						mapa = new Mapa(5,5);
 						Pais paisI = new Pais("Pais " + (i + 1), (i + 1), mapa, poblacion[i].getGenoma());
 						Pais paisJ = new Pais("Pais " + (j + 1), (j + 1), mapa, poblacion[j].getGenoma());
-						RealizarPartida.realizarPartida(mapa, paisI, paisJ);
+						game.RealizarPartida.realizarPartida(mapa, paisI, paisJ);
 						puntuaciones[i][j] = Evaluacion.evaluar(paisI);
+						System.out.println("pais puntuado "+ puntuaciones[i][j]);
 						puntuaciones[j][i] = Evaluacion.evaluar(paisJ);
 					} else {
 						puntuaciones[i][j] = -1;
 					}
 				}
+				int [] p = new int [] {2,4,6};
 				poblacion[i].setPuntuacion(Utiles.calcularMedia(puntuaciones[i]));
+				System.out.println("puntuacion " + poblacion[i].getPuntuacion());
 			}
+			for (Individuo individuo : poblacion)
+				System.out.println("PRE "+individuo.toString());
 			//TODO MODIFICAR SELECCION POR TORNEO PARA ELEGIR REPRODUCTORES
 			Arrays.sort(poblacion, new compararIndividuos());
+			for (Individuo individuo : poblacion)
+				System.out.println("POST "+individuo.toString());
 			// Operador de selección: marcamos a los que se van a eliminar, sus posiciones serán
 			// sustituidas por los nuevos individuos resultados de los cruces.
 			OperadorSeleccion.seleccionEliminados(poblacion, numInsercion);

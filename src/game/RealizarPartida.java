@@ -49,6 +49,7 @@ public class RealizarPartida {
 			pais2.terminaTurno();
 			turno++;
 		}
+		System.out.println("Partida terminada");
 	}
 
 	// TODO : BUSCAR INTERFACE JAVA

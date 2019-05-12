@@ -77,7 +77,6 @@ public class Pais {
 			this.rmTerritorio(casilla);
 			casilla.neutralizarCasilla();
 		}
-		this.printCasillas();
 	}
 
 	public int [] getGenoma () {

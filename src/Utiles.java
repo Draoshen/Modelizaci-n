@@ -11,6 +11,7 @@ public class Utiles implements Comparator<Individuo> {
 	public static int calcularMedia(int[] numeros) {
 		int sum = 0;
 		int count = 0;
+		System.out.println(".....................");
 		for (int num : numeros) {
 			if (num >= 0) {
 				sum += num;

@@ -64,7 +64,7 @@ public class OperadorSeleccion {
 
 	private static void eliminaPeores (Individuo [] poblacion, int cantidad) {
 		for (int i = 0; i < cantidad; i++)
-			poblacion[poblacion.length-i].setParaEliminar();
+			poblacion[poblacion.length-(i+1)].setParaEliminar();
 	}
 
 	private static void eliminaPadres(Individuo [] poblacion, int cantidad) {
