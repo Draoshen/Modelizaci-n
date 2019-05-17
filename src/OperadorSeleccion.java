@@ -7,13 +7,16 @@ public class OperadorSeleccion {
 	public static void seleccionEliminados (Individuo [] poblacion) {
 		int cantidad = Main.numInsercion;
 		// Eliminar a los n peores (modelo elitista)
-		 eliminaPeores(poblacion,cantidad);
+		// eliminaPeores(poblacion,cantidad);
 
 		// Eliminar a los n padres (los seleccionados para reproduccion
 		// eliminaPadres(poblacion,cantidad);
 
+		// Eliminar por torneo: elegimos dos aleatorios de la población, eliminamos al que tenga peor puntuación
+		// eliminaPorTorneo(poblacion, cantidad);
+
 		// Eliminar aleatoriamente
-		// eliminaAleatori(poblacion, cantidad);
+		 eliminaAleatori(poblacion, cantidad);
 
 		for (Individuo individuo : poblacion)
 			if (individuo.isParaEliminar()) System.out.println("Eliminados: Individuo " + individuo.getId());
@@ -22,7 +25,7 @@ public class OperadorSeleccion {
 	public static void seleccionReproductores (Individuo [] poblacion) {
 		int cantidad = Main.numInsercion;
 		// Seleccionar como reproductores a los n mejores
-		 cruzaMejores(poblacion,cantidad);
+		cruzaMejores(poblacion,cantidad);
 
 		// Seleccionar como reproductores a los n peores
 		// cruzaPeores(poblacion,cantidad);
@@ -88,9 +91,13 @@ public class OperadorSeleccion {
 
 	private static void eliminaAleatori (Individuo [] poblacion, int cantidad) {
 		int pos;
-		for (int i = 0; i < cantidad; i++) {
+		int marcados = 0;
+		while (marcados < cantidad) {
 			pos = Utiles.getRandomNumberInts(0, (poblacion.length - 1));
-			if (!poblacion[pos].isParaEliminar()) poblacion[pos].setParaEliminar(true);
+			if (!poblacion[pos].isParaEliminar()) {
+				poblacion[pos].setParaEliminar(true);
+				marcados++;
+			}
 		}
 	}
 

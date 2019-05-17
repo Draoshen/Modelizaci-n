@@ -8,6 +8,10 @@ public class Main {
 	static int tamañoPoblacion = 10;
 	static int numInsercion = 4;
 
+	// todo: terminar operadores de selección
+	// todo: equilibrar estrategias del juego, que no se queden todos los turno sin hacer nada
+	// todo: mejorar la función de evaluación
+	// todo: ir imprimiendo resultados en algún archivo, ir guardando los genomas que más generaciones aguantan
 
 	public static void main(String[] args) throws Exception {
 
