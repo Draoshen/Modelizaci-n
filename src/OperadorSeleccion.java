@@ -4,20 +4,23 @@ import java.util.Arrays;
 public class OperadorSeleccion {
 
 	// Recibe una lista ordenada de individuos ya evaluados
-	public static void seleccionEliminados (Individuo [] poblacion, int cantidad) {
-
+	public static void seleccionEliminados (Individuo [] poblacion) {
+		int cantidad = Main.numInsercion;
 		// Eliminar a los n peores (modelo elitista)
-		eliminaPeores(poblacion,cantidad);
+		 eliminaPeores(poblacion,cantidad);
 
 		// Eliminar a los n padres (los seleccionados para reproduccion
 		// eliminaPadres(poblacion,cantidad);
 
 		// Eliminar aleatoriamente
 		// eliminaAleatori(poblacion, cantidad);
+
+		for (Individuo individuo : poblacion)
+			if (individuo.isParaEliminar()) System.out.println("Eliminados: Individuo " + individuo.getId());
 	}
 
-	public static void seleccionReproductores (Individuo [] poblacion, int cantidad) {
-
+	public static void seleccionReproductores (Individuo [] poblacion) {
+		int cantidad = Main.numInsercion;
 		// Seleccionar como reproductores a los n mejores
 		 cruzaMejores(poblacion,cantidad);
 
@@ -35,18 +38,18 @@ public class OperadorSeleccion {
 
 		for (int i = 0; i < poblacion.length; i++)
 			if (!poblacion[i].isParaEliminar()) poblacionResultado.add(poblacion[i]);
-
+		System.out.println("el arraylist poblacionResultado de eliminaSeleccionados con length "+ poblacionResultado.size() + " de 6 esperado");
 		return poblacionResultado.toArray(new Individuo[poblacionResultado.size()]);
 	}
 
 	private static void cruzaMejores (Individuo [] poblacion, int cantidad) {
 		for (int i = 0; i < cantidad; i++)
-			poblacion[i].setParaCruzar();
+			poblacion[i].setParaCruzar(true);
 	}
 
 	private static void cruzaPeores (Individuo [] poblacion, int cantidad) {
 		for (int i = 0; i < cantidad; i++)
-			poblacion[poblacion.length-i].setParaCruzar();
+			poblacion[poblacion.length-(i+1)].setParaCruzar(true);
 	}
 
 	private static void cruzaMixto (Individuo [] poblacion, int cantidad) {
@@ -58,26 +61,37 @@ public class OperadorSeleccion {
 		int pos;
 		for (int i = 0; i < cantidad; i++) {
 			pos = Utiles.getRandomNumberInts(0, (poblacion.length - 1));
-			if (!poblacion[pos].isParaCruzar()) poblacion[pos].setParaCruzar();
+			if (!poblacion[pos].isParaCruzar()) poblacion[pos].setParaCruzar(true);
 		}
 	}
 
+	/* todo: todavía por terminar
+	private static void eliminaPorTorneo (Individuo [] poblacion, int cantidad) {
+		for (int i = 0; i < cantidad; i++) {
+			Individuo ind1 = poblacion[Utiles.getRandomNumberInts(0,poblacion.length-1)];
+			Individuo ind2 = poblacion[Utiles.getRandomNumberInts(0,poblacion.length-1)];
+			compararIndividuos
+
+		}
+	}
+	*/
+
 	private static void eliminaPeores (Individuo [] poblacion, int cantidad) {
 		for (int i = 0; i < cantidad; i++)
-			poblacion[poblacion.length-(i+1)].setParaEliminar();
+			poblacion[poblacion.length-(i+1)].setParaEliminar(true);
 	}
 
 	private static void eliminaPadres(Individuo [] poblacion, int cantidad) {
-		for (int i = 0; i < cantidad; i++)
-			if (poblacion[poblacion.length-i].isParaCruzar())
-				poblacion[poblacion.length-i].setParaEliminar();
+		for (Individuo individuo : poblacion)
+			if (individuo.isParaCruzar())
+				individuo.setParaEliminar(true);
 	}
 
 	private static void eliminaAleatori (Individuo [] poblacion, int cantidad) {
 		int pos;
 		for (int i = 0; i < cantidad; i++) {
 			pos = Utiles.getRandomNumberInts(0, (poblacion.length - 1));
-			if (!poblacion[pos].isParaEliminar()) poblacion[pos].setParaEliminar();
+			if (!poblacion[pos].isParaEliminar()) poblacion[pos].setParaEliminar(true);
 		}
 	}
 

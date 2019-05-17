@@ -4,12 +4,16 @@ import game.*;
 
 public class Main {
 
+	static int ultimoID = 10;
+	static int tamañoPoblacion = 10;
+	static int numInsercion = 4;
+
+
 	public static void main(String[] args) throws Exception {
 
 		// INICIALIZACIÓN
 		// Array de genomas (array de array de números (genes))
-		int tamañoPoblacion = 10;
-		int numInsercion = 4;
+
 		Individuo[] poblacion = new Individuo[tamañoPoblacion];
 		int[][] puntuaciones = new int[tamañoPoblacion][tamañoPoblacion];
 
@@ -33,7 +37,7 @@ public class Main {
 
 		// CRITERIO DE PARADA:
 		// - Consumo de recursos: alcanzar número de generaciones
-		int numGeneraciones = 50;
+		int numGeneraciones = 10;
 
 		// - Superar un umbral de calidad
 
@@ -41,20 +45,21 @@ public class Main {
 
 		for (int generacion = 0; generacion < numGeneraciones; generacion++) {
 
-			System.out.println("GENERACIÓN: " + generacion);
+			System.out.println("GENERACIÓN: " + (generacion+1));
 			Mapa mapa = new Mapa(5, 5);
 
 			// EVALUACIÓN: Enfrentamos todos contra todos y los evaluamos
 			for (int i = 0; i < tamañoPoblacion; i++) {
+				//System.out.println("País actual: " + i);
 				for (int j = (i + 1); j < tamañoPoblacion; j++) {
 					if (i != j) {
-						System.out.println("i , j : " + i + j);
+						//System.out.println("i , j : " + i + " " + j);
 						mapa = new Mapa(5,5);
 						Pais paisI = new Pais("Pais " + (i + 1), (i + 1), mapa, poblacion[i].getGenoma());
 						Pais paisJ = new Pais("Pais " + (j + 1), (j + 1), mapa, poblacion[j].getGenoma());
 						game.RealizarPartida.realizarPartida(mapa, paisI, paisJ);
 						puntuaciones[i][j] = Evaluacion.evaluar(paisI);
-						System.out.println("pais puntuado "+ puntuaciones[i][j]);
+						//System.out.println("pais puntuado "+ puntuaciones[i][j]);
 						puntuaciones[j][i] = Evaluacion.evaluar(paisJ);
 					} else {
 						puntuaciones[i][j] = -1;
@@ -62,33 +67,40 @@ public class Main {
 				}
 				int [] p = new int [] {2,4,6};
 				poblacion[i].setPuntuacion(Utiles.calcularMedia(puntuaciones[i]));
-				System.out.println("puntuacion " + poblacion[i].getPuntuacion());
+				//System.out.println("puntuación del país " + i + ": " + poblacion[i].getPuntuacion());
 			}
-			for (Individuo individuo : poblacion)
-				System.out.println("PRE "+individuo.toString());
-			//TODO MODIFICAR SELECCION POR TORNEO PARA ELEGIR REPRODUCTORES
+			Arrays.toString(puntuaciones);
 			Arrays.sort(poblacion, new compararIndividuos());
+			System.out.println("Individuos ordenados POST evaluación");
 			for (Individuo individuo : poblacion)
-				System.out.println("POST "+individuo.toString());
+				System.out.println(individuo.toString());
 			// Operador de selección: marcamos a los que se van a eliminar, sus posiciones serán
 			// sustituidas por los nuevos individuos resultados de los cruces.
-			OperadorSeleccion.seleccionEliminados(poblacion, numInsercion);
-			OperadorSeleccion.seleccionReproductores(poblacion, numInsercion);
-			Individuo[] nuevosIndividuos = OperadorCruce.generarNuevosIndividuos(poblacion, numInsercion);
+			OperadorSeleccion.seleccionReproductores(poblacion);
+			OperadorSeleccion.seleccionEliminados(poblacion);
+			Individuo[] nuevosIndividuos = OperadorCruce.generarNuevosIndividuos(poblacion);
 			Individuo[] poblacionReducida = OperadorSeleccion.eliminaSeleccionados(poblacion);
+			System.out.println("eeeee tamaño pob " + poblacionReducida.length);
+			poblacion = OperadorCruce.insertarNuevos(poblacionReducida, nuevosIndividuos);
 
-			poblacion = OperadorCruce.insertarNuevos(poblacionReducida, nuevosIndividuos, tamañoPoblacion);
+
+			for (Individuo ind : nuevosIndividuos)
+				System.out.println("Nuevo generado: Individuo " + ind.getId());
+
+			for (Individuo individuo : poblacion) {
+				individuo.setParaCruzar(false);
+				individuo.setParaEliminar(false);
+
+			}
 		}
 	}
-
-	// TODO : crea población, los enfrenta, los evalúa, los clasifica, selecicona a los mejores
 
 }
 
 class compararIndividuos implements Comparator<Individuo> {
 	@Override
 	public int compare(Individuo ind1, Individuo ind2) {
-		return ind1.getPuntuacion() - ind2.getPuntuacion();
+		return ind2.getPuntuacion() - ind1.getPuntuacion();
 	}
 }
 

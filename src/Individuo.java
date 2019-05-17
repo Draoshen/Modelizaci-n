@@ -37,16 +37,16 @@ public class Individuo {
 		return this.paraCruzar;
 	}
 
-	public void setParaCruzar () {
-		this.paraCruzar = true;
+	public void setParaCruzar (boolean value) {
+		this.paraCruzar = value;
 	}
 
 	public boolean isParaEliminar () {
 		return this.paraEliminar;
 	}
 
-	public void setParaEliminar () {
-		this.paraEliminar = true;
+	public void setParaEliminar (boolean value) {
+		this.paraEliminar = value;
 	}
 
 	public int getId () {
