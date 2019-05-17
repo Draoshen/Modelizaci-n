@@ -39,8 +39,6 @@ public class OperadorCruce {
 
 	public static Individuo [] insertarNuevos (Individuo [] poblacion, Individuo [] nuevos) throws Exception {
 
-		System.out.println("número nuevos individuos: " + nuevos.length);
-		System.out.println("número individuos eliminados: " + poblacion.length);
 		if (nuevos.length + poblacion.length != Main.tamañoPoblacion)
 			throw new Exception("ERROR. Num individuos eliminados != Num individuos a insertar");
 

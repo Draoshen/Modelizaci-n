@@ -45,7 +45,7 @@ public class Main {
 
 		for (int generacion = 0; generacion < numGeneraciones; generacion++) {
 
-			System.out.println("GENERACIÓN: " + (generacion+1));
+			System.out.println("\nGENERACIÓN: " + (generacion+1));
 			Mapa mapa = new Mapa(5, 5);
 
 			// EVALUACIÓN: Enfrentamos todos contra todos y los evaluamos
@@ -80,7 +80,6 @@ public class Main {
 			OperadorSeleccion.seleccionEliminados(poblacion);
 			Individuo[] nuevosIndividuos = OperadorCruce.generarNuevosIndividuos(poblacion);
 			Individuo[] poblacionReducida = OperadorSeleccion.eliminaSeleccionados(poblacion);
-			System.out.println("eeeee tamaño pob " + poblacionReducida.length);
 			poblacion = OperadorCruce.insertarNuevos(poblacionReducida, nuevosIndividuos);
 
 

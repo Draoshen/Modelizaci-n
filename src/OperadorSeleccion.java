@@ -38,7 +38,6 @@ public class OperadorSeleccion {
 
 		for (int i = 0; i < poblacion.length; i++)
 			if (!poblacion[i].isParaEliminar()) poblacionResultado.add(poblacion[i]);
-		System.out.println("el arraylist poblacionResultado de eliminaSeleccionados con length "+ poblacionResultado.size() + " de 6 esperado");
 		return poblacionResultado.toArray(new Individuo[poblacionResultado.size()]);
 	}
 
