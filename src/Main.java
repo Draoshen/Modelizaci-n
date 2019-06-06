@@ -1,109 +1,112 @@
-import java.util.Arrays;
-import java.util.Comparator;
-import game.*;
+import genetics.Ejecucion;
+import genetics.Individuo;
+import genetics.Resultado;
+import genetics.Utiles;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 public class Main {
 
-	static int ultimoID = 10;
-	static int tamañoPoblacion = 10;
-	static int numInsercion = 4;
+	private static File output = new File("./out/Resultados.txt");
+	private static File output_resumen = new File ("./out/ResultadosResumidos.txt");
+	private static BufferedWriter writer;
+	private static BufferedWriter writer_resumen;
+	private static int tamañoPoblacion = 10;
+	private static int numInsercion = (int) (tamañoPoblacion*0.4);
+	private static int numGeneraciones = 50;
+	private static int numEjecuciones = 10;
+	private static Resultado [] resultados = new Resultado [numEjecuciones];
 
-	// todo: terminar operadores de selección
-	// todo: equilibrar estrategias del juego, que no se queden todos los turno sin hacer nada
+	// todo: seleccion del mejor genoma no va, siempre pone en 1 individuosz
 	// todo: mejorar la función de evaluación
 	// todo: ir imprimiendo resultados en algún archivo, ir guardando los genomas que más generaciones aguantan
 
 	public static void main(String[] args) throws Exception {
 
-		// INICIALIZACIÓN
-		// Array de genomas (array de array de números (genes))
+		// Una ejecución del programa consiste en enfrentar a los individuos de la población entre sí
+		// durante numGeneraciones
+		// Se van a realizar numEjecuciones ejecuciones del programa.
+		// Para cada ejecucion, se van a realizar todas las posibles combinaciones de operadores de selección y cruce.
 
-		Individuo[] poblacion = new Individuo[tamañoPoblacion];
-		int[][] puntuaciones = new int[tamañoPoblacion][tamañoPoblacion];
+		try {
+			writer = new BufferedWriter(new FileWriter(output));
+			writer_resumen = new BufferedWriter(new FileWriter(output_resumen));
+		} catch (Exception e) {};
 
-		for (int i = 0; i < tamañoPoblacion; i++) {
-			poblacion[i] = new Individuo(i);
-			for (int j = 0; j < 3; j++)
-				poblacion[i].modGen(j, Utiles.getRandomNumberInts(1, 2));
-			for (int j = 3; j < 6; j++)
-				poblacion[i].modGen(j, Utiles.getRandomNumberInts(0, 2));
-		}
+		String textToFile = "\n\nINICIO DEL PROGRAMA.\nSe van a realizar " + numEjecuciones
+				+ " ejecuciones del programa. En cada ejecución se crea una nueva población.\nCada ejecución consta " +
+				"de la evaluación de su población tras " + numGeneraciones + " generaciones para cada uno de los " +
+				"criterios de selección.\nHay 4 criterios de selección de individuos para eliminar: 1. Peores, " +
+				"2. Padres, 3. Por torneo y 4. Aleatoria.\nHay 5 criterios de selección de individuos para " +
+				"reproducirse: 1. Mejores, 2. Peores, 3. Por torneo, 4. Mixta y 5. Aleatoria.\nEn total, en cada " +
+				"ejecución se realizan 20 evaluaciones de la población.";
+		writer.write(textToFile);
+		writer_resumen.write(textToFile);
+		System.out.println(textToFile);
 
-		/* Prueba individual
-		Mapa mapa = new Mapa(5,5);
-		System.out.println("\nCREACIÓN DE LOS PAÍSES.");
-		int [] genomaPais1 = new int [] {1, 1, 1, 0 , 1 , 2};
-		int [] genomaPais2 = new int [] {1, 1, 1, 0 , 1 , 2};
-		Pais pais1 = new Pais("Pais 1",1,mapa,genomaPais1);
-		Pais pais2 = new Pais("Pais 2", 2,mapa,genomaPais2);
-		RealizarPartida.realizarPartida(mapa,pais1,pais2);
-		*/
+		for (int numEjec = 0; numEjec < numEjecuciones; numEjec++) {
+			textToFile = "\n\nEJECUCIÓN " + (numEjec+1) + " del programa \n";
+			writer.write(textToFile);
+			System.out.println(textToFile);
 
-		// CRITERIO DE PARADA:
-		// - Consumo de recursos: alcanzar número de generaciones
-		int numGeneraciones = 10;
-
-		// - Superar un umbral de calidad
-
-		// - Estancamiento en la mejora
-
-		for (int generacion = 0; generacion < numGeneraciones; generacion++) {
-
-			System.out.println("\nGENERACIÓN: " + (generacion+1));
-			Mapa mapa = new Mapa(5, 5);
-
-			// EVALUACIÓN: Enfrentamos todos contra todos y los evaluamos
+			// INICIALIZACIÓN de la población
+			// Array de genomas (array de array de números (genes))
+			Individuo[] poblacion = new Individuo[tamañoPoblacion];
+			double[][] puntuaciones = new double[tamañoPoblacion][tamañoPoblacion];
 			for (int i = 0; i < tamañoPoblacion; i++) {
-				//System.out.println("País actual: " + i);
-				for (int j = (i + 1); j < tamañoPoblacion; j++) {
-					if (i != j) {
-						//System.out.println("i , j : " + i + " " + j);
-						mapa = new Mapa(5,5);
-						Pais paisI = new Pais("Pais " + (i + 1), (i + 1), mapa, poblacion[i].getGenoma());
-						Pais paisJ = new Pais("Pais " + (j + 1), (j + 1), mapa, poblacion[j].getGenoma());
-						game.RealizarPartida.realizarPartida(mapa, paisI, paisJ);
-						puntuaciones[i][j] = Evaluacion.evaluar(paisI);
-						//System.out.println("pais puntuado "+ puntuaciones[i][j]);
-						puntuaciones[j][i] = Evaluacion.evaluar(paisJ);
-					} else {
-						puntuaciones[i][j] = -1;
-					}
+				poblacion[i] = new Individuo(i);
+				for (int j = 0; j < 3; j++)
+					poblacion[i].modGen(j, Utiles.getRandomNumberInts(1, 2));
+				poblacion[i].modGen(3, Utiles.getRandomNumberInts(0, 2));
+				poblacion[i].modGen(4, Utiles.getRandomNumberInts(0, 2));
+				while (poblacion[i].getGen(4) == poblacion[i].getGen(3))
+					poblacion[i].modGen(4, Utiles.getRandomNumberInts(0, 2));
+				poblacion[i].modGen(5, Utiles.getRandomNumberInts(0, 2));
+				while (poblacion[i].getGen(5) == poblacion[i].getGen(4)
+						|| poblacion[i].getGen(5) == poblacion[i].getGen(3))
+					poblacion[i].modGen(5, Utiles.getRandomNumberInts(0, 2));
+			}
+
+			// CRITERIO DE PARADA:
+			// - Consumo de recursos: alcanzar número de generaciones (HECHO, EN USO).
+
+			// - Superar un umbral de calidad (NO HECHO)
+
+			// - Estancamiento en la mejora (NO HECHO)
+
+			// EJECUCIÓN del programa (numGeneraciones generaciones de partidas entre individuos de la pob)
+			Resultado resultado = new Resultado();
+			Individuo [] poblacionAux = new Individuo[tamañoPoblacion];
+			for (int criterioElim = 1; criterioElim <= 4; criterioElim++)
+				for (int criterioRep = 1; criterioRep <= 5; criterioRep++) {
+					// Reseteamos la población a como estaba al principio
+					for (int i = 0; i < poblacion.length; i++)
+						poblacionAux[i] = poblacion[i].clone();
+					textToFile = "\n\nEJECUCIÓN "+ (numEjec+1) + " con CRITERIOS: Eliminación: " + criterioElim + " y Reproducción: " + criterioRep;
+					writer.write(textToFile);
+					System.out.println(textToFile);
+					Ejecucion.ejecucionPoblacion(poblacionAux, tamañoPoblacion, numGeneraciones,
+							numInsercion, puntuaciones, criterioElim, criterioRep,writer);
+					resultado.setMejorGenoma(poblacionAux, criterioElim, criterioRep);
 				}
-				int [] p = new int [] {2,4,6};
-				poblacion[i].setPuntuacion(Utiles.calcularMedia(puntuaciones[i]));
-				//System.out.println("puntuación del país " + i + ": " + poblacion[i].getPuntuacion());
-			}
-			Arrays.toString(puntuaciones);
-			Arrays.sort(poblacion, new compararIndividuos());
-			System.out.println("Individuos ordenados POST evaluación");
-			for (Individuo individuo : poblacion)
-				System.out.println(individuo.toString());
-			// Operador de selección: marcamos a los que se van a eliminar, sus posiciones serán
-			// sustituidas por los nuevos individuos resultados de los cruces.
-			OperadorSeleccion.seleccionReproductores(poblacion);
-			OperadorSeleccion.seleccionEliminados(poblacion);
-			Individuo[] nuevosIndividuos = OperadorCruce.generarNuevosIndividuos(poblacion);
-			Individuo[] poblacionReducida = OperadorSeleccion.eliminaSeleccionados(poblacion);
-			poblacion = OperadorCruce.insertarNuevos(poblacionReducida, nuevosIndividuos);
-
-
-			for (Individuo ind : nuevosIndividuos)
-				System.out.println("Nuevo generado: Individuo " + ind.getId());
-
-			for (Individuo individuo : poblacion) {
-				individuo.setParaCruzar(false);
-				individuo.setParaEliminar(false);
-
-			}
+			resultado.setNumEjecucion(numEjec);
+			resultados[numEjec] = resultado;
 		}
+		// Imprimimos el mejor genoma para cada uno de los criterios en cada ejecución
+		for (Resultado resultado : resultados) {
+			textToFile = "\n\nRESULTADOS DE LA EJECUCIÓN " + (resultado.getNumEjecucion()+1);
+			writer.write(textToFile);
+			writer_resumen.write(textToFile);
+			System.out.println(textToFile);
+			resultado.printMejoresGenomas(writer);
+			resultado.printMejoresGenomas(writer_resumen);
+		}
+		writer.close();
+		writer_resumen.close();
 	}
-
 }
 
-class compararIndividuos implements Comparator<Individuo> {
-	@Override
-	public int compare(Individuo ind1, Individuo ind2) {
-		return ind2.getPuntuacion() - ind1.getPuntuacion();
-	}
-}
+
 

@@ -1,14 +1,14 @@
+package genetics;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class OperadorCruce {
 
-	public static Individuo[] generarNuevosIndividuos (Individuo[] poblacion) throws Exception {
+	public static Individuo[] generarNuevosIndividuos (Individuo[] poblacion, int cantidad) throws Exception {
 		ArrayList<Individuo> reproductores = new ArrayList<>();
 		ArrayList<Individuo> repAux;
 		ArrayList <Individuo> nuevos = new ArrayList<Individuo>();
-		int cantidad = Main.numInsercion;
 		int numGenerados = 0;
 
 		for (int i = 0; i < poblacion.length; i++)
@@ -16,8 +16,6 @@ public class OperadorCruce {
 
 		if (reproductores.size() <= 1) throw new Exception("REPRODUCTORES INSUFICIENTES: Se necesitan al menos 2.");
 
-		for (Individuo individuo : reproductores)
-			System.out.println("Reproductores: " + individuo.toString());
 		repAux = (ArrayList<Individuo>) reproductores.clone();
 		while (numGenerados < cantidad && 2 <= reproductores.size()) {
 
@@ -37,9 +35,9 @@ public class OperadorCruce {
 		return nuevos.toArray(new Individuo[nuevos.size()]);
 	}
 
-	public static Individuo [] insertarNuevos (Individuo [] poblacion, Individuo [] nuevos) throws Exception {
+	public static Individuo [] insertarNuevos (Individuo [] poblacion, Individuo [] nuevos, int tamPob) throws Exception {
 
-		if (nuevos.length + poblacion.length != Main.tamañoPoblacion)
+		if (nuevos.length + poblacion.length != tamPob)
 			throw new Exception("ERROR. Num individuos eliminados != Num individuos a insertar");
 
 		ArrayList<Individuo> nuevaPoblacion = new ArrayList<Individuo>(Arrays.asList(poblacion));
@@ -48,13 +46,13 @@ public class OperadorCruce {
 	}
 
 	private static Individuo cruzar (Individuo progenitor1, Individuo progenitor2) {
-		Individuo nuevoIndividuo = new Individuo(Main.ultimoID);
+		Individuo nuevoIndividuo = new Individuo(Ejecucion.ultimoID);
 		Individuo [] progenitores = new Individuo[]{progenitor1,progenitor2};
 
 		for (int i = 0; i < progenitor1.getGenoma().length; i++) {
 			nuevoIndividuo.modGen(i, progenitores[Utiles.getRandomNumberInts(0,1)].getGen(i));
 		}
-		Main.ultimoID += 1;
+		Ejecucion.ultimoID += 1;
 		return nuevoIndividuo;
 	}
 

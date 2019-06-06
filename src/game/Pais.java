@@ -13,6 +13,8 @@ public class Pais {
 	private int [] genoma;
 	// Conjunto de casillas pertenecientes al país
 	private ArrayList<Casilla> territorio;
+	// Atributo que indica si el país ha ganado o no la partida
+	private boolean ganador;
 	// Cantidad de comida que cuesta crear un civil o un militar
 	private int precioCrearPoblacion = 1;
 	// game.Mapa al que pertenece el país
@@ -136,6 +138,10 @@ public class Pais {
 			pob += casilla.getPobMilitar();
 		return  pob;
 	}
+
+	public boolean isGanador () { return  this.ganador; }
+
+	public void setGanador (boolean value) { this.ganador = value; }
 
 	public void printCasillas() {
 		String imprimir;

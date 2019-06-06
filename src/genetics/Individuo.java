@@ -1,6 +1,6 @@
-import javax.naming.InitialContext;
+package genetics;
+
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class Individuo {
 
@@ -71,6 +71,13 @@ public class Individuo {
 
 	public void setPuntuacion(int nuevaPunt) {
 		this.puntuacion = nuevaPunt;
+	}
+
+	public Individuo clone() {
+		Individuo individuoAux = new Individuo(this.id);
+		for (int i = 0; i < 6; i++)
+			individuoAux.modGen(i, this.getGen(i));
+		return  individuoAux;
 	}
 
 	@Override

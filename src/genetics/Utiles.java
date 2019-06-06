@@ -1,3 +1,7 @@
+package genetics;
+
+import genetics.Individuo;
+
 import  java.util.Random;
 import  java.util.Comparator;
 
@@ -8,10 +12,10 @@ public class Utiles implements Comparator<Individuo> {
 		return random.ints(min, (max + 1)).findFirst().getAsInt();
 	}
 
-	public static int calcularMedia(int[] numeros) {
+	public static int calcularMedia(double [] numeros) {
 		int sum = 0;
 		int count = 0;
-		for (int num : numeros) {
+		for (double num : numeros) {
 			if (num >= 0) {
 				sum += num;
 				count++;
@@ -22,6 +26,6 @@ public class Utiles implements Comparator<Individuo> {
 
 	@Override
 	public int compare(Individuo ind1, Individuo ind2) {
-		return ind1.getPuntuacion() - ind2.getPuntuacion();
+		return ind2.getPuntuacion() - ind1.getPuntuacion();
 	}
 }
